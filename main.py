@@ -8,13 +8,11 @@ import os
 
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
-server_id = os.getenv("SERVER_ID")
 api_key = os.getenv("API_KEY")
 
 if not token:
     raise RuntimeError("DISCORD_TOKEN not found in .env")
-if not server_id:
-    raise RuntimeError("SERVER_ID not found in .env")
+
 
 handler = logging.FileHandler(filename='discord.log',encoding='utf-8',mode='w')
 
@@ -23,18 +21,12 @@ intents.message_content = True
 intents.members = True
 
 bot = commands.Bot(command_prefix=["/","!"], intents=intents)
-guild_id = discord.Object(id=int(server_id))
-
 
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} has gone online')
 
-    try:
-        synced = await bot.tree.sync(guild=guild_id)
-        print(f"Synced {len(synced)} commands to the guild!")
-    except Exception as e:
-        print(f"error : {e}")
+
 
 def fetch_weather(city_name):
     url=f"https://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}"
@@ -115,7 +107,7 @@ async def weather(ctx, *, city):
 
     await ctx.send(embed=embed)
     
-@bot.tree.command(name="weather",description="get the weather in the selected city",guild=guild_id)
+@bot.tree.command(name="weather",description="get the weather in the selected city")
 @app_commands.describe(
     city="Enter a city name"
 )
