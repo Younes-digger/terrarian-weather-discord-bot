@@ -12,6 +12,8 @@ api_key = os.getenv("API_KEY")
 
 if not token:
     raise RuntimeError("DISCORD_TOKEN not found in .env")
+if not api_key:
+    raise RuntimeError("API_KEY not found in .env")
 
 
 handler = logging.FileHandler(filename='discord.log',encoding='utf-8',mode='w')
@@ -24,6 +26,8 @@ bot = commands.Bot(command_prefix=["/","!"], intents=intents)
 
 @bot.event
 async def on_ready():
+    await bot.tree.sync()
+    print(f"{bot.user} ready and slash commands synced")
     print(f'{bot.user.name} has gone online')
 
 
@@ -92,7 +96,7 @@ def fetch_weather(city_name):
     except requests.exceptions.RequestException as re_error:
             return f"Request Error\n{re_error}❌"
     
-@bot.command()
+@bot.command(name="weather")
 async def weather(ctx, *, city):
     info = fetch_weather(city)
     embed = discord.Embed()
